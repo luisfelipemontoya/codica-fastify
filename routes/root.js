@@ -20,12 +20,12 @@ export default async (app, opts) => {
   });
 
   app.get("/hello", (req, res) => {
-    const name = req.query.name;
+    const name = req.query.name; 
+    res.send(`Hello, ${name ? name : "World"}!`);
+  });
 
-    if (name) {
-      res.send(`Hello, ${name}!`);
-    } else {
-      res.send("Hello, World!");
-    }
+  app.get("/users/:userId/post/posts/:postId", (req, res) => {
+    const { userId, postId } = req.params; 
+    res.send(`User ID: ${userId}; Post ID: ${postId}`);
   });
 };
