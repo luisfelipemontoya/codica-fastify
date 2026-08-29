@@ -17,5 +17,15 @@ export default async (app, opts) => {
 
   app.get("/api/users", (req, res) => {
     res.json([{ id: 1, name: "Felipe Montoya" }])
-  })
+  });
+
+  app.get("/hello", (req, res) => {
+    const name = req.query.name;
+
+    if (name) {
+      res.send(`Hello, ${name}!`);
+    } else {
+      res.send("Hello, World!");
+    }
+  });
 };
