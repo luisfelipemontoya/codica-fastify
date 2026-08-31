@@ -1,3 +1,26 @@
+const state = {
+  courses: [
+    {
+      id: 1,
+      title: "JS: Arrays",
+      description: "Curso sobre arrays en JavaScript",
+      duration: 4
+    },
+    {
+      id: 2,
+      title: "JS: Funciones",
+      description: "Curso sobre funciones en JavaScript",
+      duration: 6
+    },
+    {
+      id: 3,
+      title: "JS: Objetos",
+      description: "Curso sobre objetos en JavaScript",
+      duration: 5
+    }
+  ]
+};
+
 export default async (app, opts) => {
   app.get('/', (req, res) => {
     res.view("src/views/index");
