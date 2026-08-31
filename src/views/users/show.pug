@@ -1,0 +1,22 @@
+extends ../layouts/page.pug
+
+block content
+  h1 Perfil de Usuario
+  
+  .user-profile
+    .user-card
+      p
+        strong ID: 
+        span #{user.id}
+      p
+        strong Nombre: 
+        span #{user.name}
+      if user.email
+        p
+          strong Correo: 
+          span #{user.email}
+  
+  .actions
+    a.back-link(href='/users')
+    br
+    a.back-link(href='/') 
