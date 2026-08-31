@@ -1,0 +1,7 @@
+extends ../layouts/page.pug
+
+block content   
+    a(href='/courses')
+    h1= course.title
+    p= course.description   
+        p Duración: #{course.duration} horas

@@ -1,0 +1,13 @@
+extends ../layouts/page.pug
+
+block content 
+    h1= header 
+    if courses.lenght === 0
+        p No hay cursos disponibles 
+    else    
+        each course in courses 
+            .course-card    
+                h2  
+                    a(href=`/courses/${course.id}`)= course.title 
+                p= course.description 
+                p Duración: #{course.duration} horas

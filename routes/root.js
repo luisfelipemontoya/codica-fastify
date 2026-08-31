@@ -1,7 +1,26 @@
 export default async (app, opts) => {
   app.get('/', (req, res) => {
-    res.send("Hello World!");
+    res.view("src/views/index");
   });
+
+  app.get("/courses", (req, res) => {
+    const data = {
+      courses: state.courses,
+      header: "Cursos de programación"
+    };
+    res.view("src/views/courses/index", data);
+  });
+
+  app.get("/courses/:id", (req, res) => {
+    const { id } = req.params;
+    const course = state.courses.fina(c => c.id === parseInt(id));
+
+    if (!course) {
+      return res.code(404).send({ message: "Course not found"});
+      }
+
+      res.view("src/views/courses/show", { course });  
+});
 
   app.get("/about", (req, res) => {
     res.send("About this project");

@@ -1,0 +1,19 @@
+html(lang='es')
+    head
+        meta(CHARSET='UTF-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
+        title codica-fastify 
+        style 
+            include ../styles/style.css
+        body    
+            header 
+                nav 
+                    a(href='/') Inicio 
+                    a(href='/courses') Cursos 
+                    a(href='/about') Acerca de 
+            main 
+                block content 
+
+            footer 
+                p Desarrollado por 
+                    a(href='https://github.com/luisfelipemontoya') Luis Felipe Montoya Munera
