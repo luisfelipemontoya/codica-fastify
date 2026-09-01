@@ -18,7 +18,7 @@ export default async (app, opts) => {
   
   //Formulario de creación
   app.get("/users/new", (req, res) => {
-    res,view("src/views/users/new");
+    res.view("src/views/users/new");
   });
 
   app.get("/users/:id", (req, res) => {
@@ -42,13 +42,14 @@ export default async (app, opts) => {
 
     //Normalizar y crear nuevo usuario
     const newUser = {
-      id: state.users.lenght + 1,
+      id: state.users.length + 1,
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: password
     };
-    
-    state.user.push(newUser); 
-    res.send("POST /users");
+
+    state.users.push(newUser); 
+
+    res.redirect("/users");
   });
 };

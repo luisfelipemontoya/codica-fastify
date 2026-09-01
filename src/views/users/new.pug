@@ -3,46 +3,47 @@ extends ../layouts/page.pug
 block content 
     h1 Crear nuevo Usuario 
 
-    form(action='/users' method='post')
-        .form-group     
-            label(for='name') Nombre: 
-            input(
-                type='text'
-                name='name'
-                id='name'
-                placeholder='Nombre completo'
-                required
-            )
-
-        .form-group 
-            label(for='email') Correo electrónico: 
-            input(
-                type='email'
-                name='email'
-                id='email'
-                placeholder='ejemplo@correo.com'
-                required
-            )
-
-            .form-group 
-                label(for='password') Contraseña: 
+    .create-form.form-container
+        form(action='/users' method='post')
+            .form-group     
+                label(for='name') Nombre: 
                 input(
-                    type='password'
-                    name='password'
-                    id='password'
-                    required
-                    minlenght='6'
-                )
-
-            .form-group 
-                label(for='passwordConfirmation') Confirmar contraseña: 
-                input(
-                    type='password'
-                    name='passwordConfirmation'
-                    id='passwordConfirmation'
+                    type='text'
+                    name='name'
+                    id='name'
+                    placeholder='Nombre completo'
                     required
                 )
 
-            .form-actions 
-                button(type='submit') Crear usuario 
-                a(href='/users') Cancelar
+            .form-group 
+                label(for='email') Correo electrónico: 
+                input(
+                    type='email'
+                    name='email'
+                    id='email'
+                    placeholder='ejemplo@correo.com'
+                    required
+                )
+
+                .form-group 
+                    label(for='password') Contraseña: 
+                    input(
+                        type='password'
+                        name='password'
+                        id='password'
+                        required
+                        minlenght='6'
+                    )
+
+                .form-group 
+                    label(for='passwordConfirmation') Confirmar contraseña: 
+                    input(
+                        type='password'
+                        name='passwordConfirmation'
+                        id='passwordConfirmation'
+                        required
+                    )
+
+                .form-actions 
+                    button(type='submit') Crear usuario 
+                    a(href='/users') Cancelar

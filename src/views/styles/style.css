@@ -49,7 +49,8 @@ main {
 }
 
 /* Cursos y usuarios*/
-.users-list .course-card {
+.users-list .course-card,
+.users-list .user-card {
   border: 1px solid #ddd;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -57,16 +58,19 @@ main {
   background-color: #fafafa;
 }
 
-.users-list .course-card h2 {
+.users-list .course-card h2,
+.users-list .user-card h2 {
   margin-bottom: 0.5rem;
 }
 
-.users-list .course-card h2 a {
+.users-list .course-card h2 a,
+.users-list .user-card h2 a {
   color: #2c3e50;
   text-decoration: none;
 }
 
-.users-list .course-card h2 a:hover {
+.users-list .course-card h2 a:hover,
+.users-list .user-card h2 a:hover {
   color: #3498db;
   text-decoration: underline;
 }
@@ -94,12 +98,27 @@ footer a:hover {
 .back-link {
   display: inline-block;
   margin-bottom: 1rem;
-  color: #3498db;
+  color: #3471db;
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 .back-link:hover {
+  color: #3498db;
   text-decoration: underline;
+}
+
+.back-link + .back-link {
+  margin-left: 1rem;
+}
+
+.actions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Mensaje de error */
@@ -111,8 +130,15 @@ p.error-message {
   font-size: 1.2rem;
 }
 
-/* Formulario de búsqueda */
-.search-form {
+/* ===== ESTILOS GENÉRICOS PARA FORMULARIOS ===== */
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-container{
   background: #f8f9fa;
   padding: 1.5rem;
   border-radius: 8px;
@@ -120,9 +146,9 @@ p.error-message {
   border: 1px solid #dee2e6;
 }
 
+/* Formulario de búsqueda */
 .search-form form {
-  display: flex;
-  gap: 1rem;
+  flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -157,6 +183,83 @@ p.error-message {
   background: #2980b9;
 }
 
+/* Formulario de creación */
+.create-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.create-form .form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.create-form .form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.create-form .form-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.create-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.create-form .form-actions button {
+  padding: 0.75rem 2rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.create-form .form-actions button:hover {
+  background: #2980b9;
+}
+
+.create-form .form-actions a {
+  padding: 0.75rem 2rem;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.create-form .form-actions a:hover {
+  background: #5a6268;
+}
+
+/* Botón de crear */
+.btn-create {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #d2c187;
+  color: #2c3e50;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  transition: background 0.2s;
+}
+
+.btn-create:hover {
+  background: #92865f;
+}
+
+/* ===== RESULTADOS Y MENSAJES ===== */
 .search-results-info {
   color: #6c757d;
   margin-bottom: 1rem;

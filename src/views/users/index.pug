@@ -1,6 +1,10 @@
 extends ../layouts/page.pug
 
 block content
+
+  .actions
+    a.btn-create(href='/users/new') Crear Nuevo Usuario
+
   h1 Usuarios Registrados
   
   if users.length === 0
@@ -13,5 +17,5 @@ block content
             a(href=`/users/${user.id}`)= user.name
           p ID: #{user.id}
           p Correo: #{user.email || 'No disponible'}
-  
-  a.back-link(href='/')
+  .actions
+    a.back-link(href='/') ← Volver al inicio
