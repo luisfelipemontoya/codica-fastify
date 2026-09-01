@@ -1,3 +1,4 @@
+import formbody from "@fastify/formbody";
 
 //Datos temporales
 const state = {
@@ -9,10 +10,17 @@ const state = {
 };
 
 export default async (app, opts) => {  
+  app.register(formbody);
+
   app.get("/users", (req, res) => {
     res.view("src/views/users/index", { users: state.users });  
   });
   
+  //Formulario de creación
+  app.get("/users/new", (req, res) => {
+    res,view("src/views/users/new");
+  });
+
   app.get("/users/:id", (req, res) => {
     const { id } = req.params;
     const user = state.users.find(u => u.id === parseInt(id));
@@ -25,7 +33,22 @@ export default async (app, opts) => {
   });
 
   // Crear usuario (POST /users)
-  app.post("/users", (req, res) => {    
+  app.post("/users", (req, res) => {  
+    const { name, email, password, passwordConfirmation } = req.body;
+    
+    if (password !== passwordConfirmation) {
+      return res.code(400).send({ message: "Las contraseñas no coinciden"});
+    }
+
+    //Normalizar y crear nuevo usuario
+    const newUser = {
+      id: state.users.lenght + 1,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password
+    };
+    
+    state.user.push(newUser); 
     res.send("POST /users");
   });
 };
