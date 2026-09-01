@@ -2,6 +2,23 @@ extends ../layouts/page.pug
 
 block content 
     h1= header 
+
+    //- Formulario de búsqueda
+    .search-form    
+        form(action='courses' method='GET')
+            input(
+                type='search'
+                name='term'
+                placeholder='Buscar cursos...'
+                value=term
+            )
+            input(type='submit' value='Buscar')
+
+    //- Resultados de búsqueda
+    if term
+        p Resultados para: #{term}
+
+
     if courses.lenght === 0
         p No hay cursos disponibles 
     else    
@@ -10,4 +27,5 @@ block content
                 h2  
                     a(href=`/courses/${course.id}`)= course.title 
                 p= course.description 
-                p Duración: #{course.duration} horas
+                if course.duration
+                    p Duración: #{course.duration} horas
