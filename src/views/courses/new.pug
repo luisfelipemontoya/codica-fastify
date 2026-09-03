@@ -1,0 +1,55 @@
+extends ../layouts/page.pug
+
+block content
+  h1 Crear Nuevo Curso
+
+  if error
+    .alert.alert-danger
+      p= error.message
+      if error.errors
+        ul
+          each err in error.errors
+            li= err
+
+  .create-form.form-container
+    form(action='/courses' method='post')
+      .form-group
+        label(for='title') Título:
+        input(
+          type='text'
+          name='title'
+          id='title'
+          value=title || ''
+          placeholder='Ej: JS: Promesas'
+          required
+        )
+      
+      .form-group
+        label(for='description') Descripción:
+        textarea(
+          name='description'
+          id='description'
+          rows='4'
+          placeholder='Describe el contenido del curso...'
+          required
+        )= description || ''
+      
+      .form-group
+        label(for='duration') Duración (horas):
+        input(
+          type='number'
+          name='duration'
+          id='duration'
+          value=duration || ''
+          placeholder='Ej: 4'
+          min='1'
+          required
+        )
+      
+      .form-actions
+        button(type='submit') Crear Curso
+        a(href='/courses') Cancelar
+  
+  .actions
+    a.back-link(href='/courses') ← Volver a cursos
+    a.back-link(href='/') ← Volver al inicio

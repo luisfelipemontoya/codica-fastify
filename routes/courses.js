@@ -1,3 +1,7 @@
+import yup from "yup";
+import formbody from "@fastify/formbody"; 
+
+//Datos temporales
 const state = {
   courses: [
     {
@@ -38,6 +42,7 @@ const state = {
 };
 
 export default async (app, opts) => {
+  await app.register(formbody);
 
   // Listar todos los cursos (GET /courses)
   app.get("/courses", (req, res) => {
@@ -60,7 +65,12 @@ export default async (app, opts) => {
     res.view("src/views/courses/index", data);
   });
 
-  // Curso específico (GET /courses/:id)
+  //Formulario para crear curso (GET /courses/new)
+  app.get("/courses/new", (req, res) => {
+    res.view("src/views/courses/new");
+  });
+
+  // Listar 1 curso específico (GET /courses/:id)
   app.get("/courses/:id", (req, res) => {
     const { id } = req.params;
     const course = state.courses.find(c => c.id === parseInt(id));
@@ -70,5 +80,48 @@ export default async (app, opts) => {
     }
 
     res.view("src/views/courses/show", { course });
+  });
+
+  // Crear curso (POST /courses) + validación
+  app.post("/courses", {
+    attachValidation: true,
+    schema: {
+      body: yup.object({
+        title: yup.string().min(2, "El título debe tener al menos 2 caracteres"),
+        description: yup.string().min(10, "La descripción debe tener al menos 10 caracteres"),
+        duration: yup.number().min(1, "La duración debe ser al menos 1 hora"),
+      }),
+    },
+    validatorCompiler: ({ schema }) => (data) => {
+      try {
+        const result = schema.validateSync(data);
+        return { value: result };        
+      } catch (e) {
+        return { error: e };
+      }
+    },
+  }, (req, res) => {
+    if (req.validationError) {
+      const data = {
+        title: req.body.title || '',
+        description: req.body.description || '',
+        duration: req.body.duration || '',
+        error: req.validationError,
+      };
+      return res.view("src/views/courses/new", data);
+    }
+
+    //Datos válidos: guardar curso
+    const { title, description, duration } = req.body;
+
+    const newCourse = {
+      id: state.courses.length + 1,
+      title: title.trim(),
+      description: description.trim(),
+      duration: parseInt(duration),
+    };
+
+    state.courses.push(newCourse);
+    res.redirect("/courses");
   });
 };
