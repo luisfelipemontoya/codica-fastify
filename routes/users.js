@@ -1,4 +1,3 @@
-import fastifyAutoload from "@fastify/autoload";
 import yup from "yup";
 import formbody from "@fastify/formbody";
 
@@ -15,16 +14,19 @@ export default async (app, opts) => {
   await app.register(formbody);
  
   //Listar todos los usuarios
-  app.get("/users", (req, res) => {
-    res.view("src/views/users/index", { users: state.users });  
+  app.get("/users", { name: "users" }, (req, res) => {
+    res.view("src/views/users/index", { 
+      users: state.users,
+      reverse: app.reverse 
+    });  
   });
   
   //Formulario de creación
-  app.get("/users/new", (req, res) => {
-    res.view("src/views/users/new");
+  app.get("/users/new", { name: "newUser" }, (req, res) => {
+    res.view("src/views/users/new", { reverse: app.reverse });
   });
 
-  app.get("/users/:id", (req, res) => {
+  app.get("/users/:id",  { name: "user" },  (req, res) => {
     const { id } = req.params;
     const user = state.users.find(u => u.id === parseInt(id));
 
@@ -32,7 +34,10 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "User not found" });
     }
 
-    res.view("src/views/users/show", { user });
+    res.view("src/views/users/show", { 
+      user,
+      reverse: app.reverse 
+     });
   });
 
   // Crear usuario (POST /users) + validación
@@ -59,8 +64,7 @@ export default async (app, opts) => {
       return { error: e };      
     }
   }, 
-}, (req, res) => {
-  console.log('Body:', req.body);
+}, (req, res) => { 
   if (req.validationError) {
     const data = {
       name: req.body.name || '',
@@ -84,6 +88,6 @@ export default async (app, opts) => {
 
     state.users.push(newUser); 
 
-    res.redirect("/users");
+    res.redirect(app.reverse("users"));
   });
 };

@@ -1,10 +1,10 @@
 export default async (app, opts) => {
-  app.get('/', (req, res) => {
-    res.view("src/views/index");
+  app.get('/', { name: "root" }, (req, res) => {
+    res.view("src/views/index", { reverse: app.reverse } );
   });
 
-  app.get("/about", (req, res) => {
-    res.send("About this project");
+  app.get("/about", { name: "about" }, (req, res) => {
+    res.send("About this project", { reverse: app.reverse } );
   });
 
   app.get("/hello", (req, res) => {

@@ -3,7 +3,7 @@ extends ../layouts/page.pug
 block content
 
   .actions
-    a.btn-create(href='/users/new') Crear Nuevo Usuario
+    a.btn-create(href=reverse('newUser')) Crear Nuevo Usuario
 
   h1 Usuarios Registrados
   
@@ -14,8 +14,8 @@ block content
       each user in users
         .user-card
           h2
-            a(href=`/users/${user.id}`)= user.name
+            a(href=reverse('user', { id: user.id }))= user.name
           p ID: #{user.id}
           p Correo: #{user.email || 'No disponible'}
   .actions
-    a.back-link(href='/') ← Volver al inicio
+    a.back-link(href=reverse('root')) ← Volver al inicio

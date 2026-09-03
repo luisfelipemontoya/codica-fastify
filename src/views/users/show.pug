@@ -17,6 +17,6 @@ block content
           span #{user.email}
   
   .actions
-    a.back-link(href='/users')  ← Volver a usuarios
+    a.back-link(href=reverse('users'))  ← Volver a usuarios
     br
-    a.back-link(href='/')  ← Volver al inicio
+    a.back-link(href=reverse('root'))  ← Volver al inicio
