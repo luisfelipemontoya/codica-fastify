@@ -3,6 +3,14 @@ extends ../layouts/page.pug
 block content 
     h1 Crear nuevo Usuario 
 
+    if error 
+        .alert.alert-danger 
+            p= error.message 
+            if error.errors 
+                ul 
+                    each err in error.errors 
+                        li= err
+
     .create-form.form-container
         form(action='/users' method='post')
             .form-group     

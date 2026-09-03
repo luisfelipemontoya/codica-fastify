@@ -1,3 +1,5 @@
+import fastifyAutoload from "@fastify/autoload";
+import yup from "yup";
 import formbody from "@fastify/formbody";
 
 //Datos temporales
@@ -9,9 +11,10 @@ const state = {
   ]
 };
 
-export default async (app, opts) => {  
-  app.register(formbody);
-
+export default async (app, opts) => { 
+  await app.register(formbody);
+ 
+  //Listar todos los usuarios
   app.get("/users", (req, res) => {
     res.view("src/views/users/index", { users: state.users });  
   });
@@ -32,15 +35,46 @@ export default async (app, opts) => {
     res.view("src/views/users/show", { user });
   });
 
-  // Crear usuario (POST /users)
-  app.post("/users", (req, res) => {  
-    const { name, email, password, passwordConfirmation } = req.body;
-    
-    if (password !== passwordConfirmation) {
-      return res.code(400).send({ message: "Las contraseñas no coinciden"});
+  // Crear usuario (POST /users) + validación
+  app.post("/users", {
+    attachValidation: true,
+    schema: {
+       body: yup.object({
+        name: yup.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+        email: yup.string().email("Formato de email inválido"),
+        password: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+        passwordConfirmation: yup.string().min(6, "La confirmación debe tener al menos 6 caracteres"),
+      }),
+    },
+    validatorCompiler: ({ schema }) => (data) => {
+      if (data.password !== data.passwordConfirmation) {
+        return {
+          error: new Error("Las contraseñas no coinciden"),
+        };
+      }
+    try {
+      const result = schema.validateSync(data);
+      return { value: result };
+    } catch (e) {
+      return { error: e };      
     }
+  }, 
+}, (req, res) => {
+  console.log('Body:', req.body);
+  if (req.validationError) {
+    const data = {
+      name: req.body.name || '',
+      email: req.body.email || '',
+      password: req.body.password || '',
+      passwordConfirmation: req.body.passwordConfirmation || '',
+      error: req.validationError,
+    };
+    return res.view("src/views/users/new", data);
+  }
 
-    //Normalizar y crear nuevo usuario
+  const { name, email, password } = req.body;
+  
+    //Datos válidos: Normalizar y guardar
     const newUser = {
       id: state.users.length + 1,
       name: name.trim(),
