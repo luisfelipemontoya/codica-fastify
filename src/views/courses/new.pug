@@ -12,7 +12,7 @@ block content
             li= err
 
   .create-form.form-container
-    form(action='/courses' method='post')
+    form(action=reverse('courses') method='post')
       .form-group
         label(for='title') Título:
         input(
@@ -48,8 +48,8 @@ block content
       
       .form-actions
         button(type='submit') Crear Curso
-        a(href='/courses') Cancelar
+        a(href=reverse('courses')) Cancelar
   
   .actions
-    a.back-link(href='/courses') ← Volver a cursos
-    a.back-link(href='/') ← Volver al inicio
+    a.back-link(href=reverse('courses')) ← Volver a cursos
+    a.back-link(href=reverse('root')) ← Volver al inicio

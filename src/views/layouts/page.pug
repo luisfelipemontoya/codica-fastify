@@ -8,10 +8,10 @@ html(lang='es')
         body    
             header 
                 nav 
-                    a(href='/') Inicio 
-                    a(href='/courses') Cursos 
-                    a(href='/users') Usuarios
-                    a(href='/about') Quiénes somos
+                    a(href=reverse('root')) Inicio 
+                    a(href=reverse('courses')) Cursos 
+                    a(href=reverse('users')) Usuarios
+                    a(href=reverse('about')) Quiénes somos
             main 
                 block content 
 

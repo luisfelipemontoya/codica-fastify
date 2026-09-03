@@ -3,13 +3,13 @@ extends ../layouts/page.pug
 block content
 
     .actions
-        a.btn-create(href='/courses/new') Crear Nuevo Curso
+        a.btn-create(href=reverse('newCourse')) Crear Nuevo Curso
 
     h1= header 
 
     //- Formulario de búsqueda
     .search-form.form-container    
-        form(action='courses' method='GET')
+        form(action=reverse('courses') method='GET')
             input(
                 type='search'
                 name='term'
@@ -29,7 +29,9 @@ block content
         each course in courses 
             .course-card    
                 h2  
-                    a(href=`/courses/${course.id}`)= course.title 
+                    a(href=reverse('course', { id: course.id }))= course.title 
                 p= course.description 
                 if course.duration
                     p Duración: #{course.duration} horas
+    .actions
+        a.back-link(href=reverse('root')) ← Volver al inicio

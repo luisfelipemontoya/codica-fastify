@@ -45,7 +45,7 @@ export default async (app, opts) => {
   await app.register(formbody);
 
   // Listar todos los cursos (GET /courses)
-  app.get("/courses", (req, res) => {
+  app.get("/courses", { name: "courses" }, (req, res) => {
     const { term } = req.query; // Obtener parámetro de búsqueda
     let filteredCourses = state.courses;
 
@@ -59,19 +59,20 @@ export default async (app, opts) => {
     const data = {
       courses: filteredCourses,
       term: term || '', // Mantener el valor en el input
-      header: "Cursos de programación"
+      header: "Cursos de programación",
+      reverse: app.reverse
     };  
     
     res.view("src/views/courses/index", data);
   });
 
   //Formulario para crear curso (GET /courses/new)
-  app.get("/courses/new", (req, res) => {
-    res.view("src/views/courses/new");
+  app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
+    res.view("src/views/courses/new", { reverse: app.reverse });
   });
 
   // Listar 1 curso específico (GET /courses/:id)
-  app.get("/courses/:id", (req, res) => {
+  app.get("/courses/:id", { name: "course" }, (req, res) => {
     const { id } = req.params;
     const course = state.courses.find(c => c.id === parseInt(id));
 
@@ -79,7 +80,10 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "Course not found" });
     }
 
-    res.view("src/views/courses/show", { course });
+    res.view("src/views/courses/show", { 
+      course, 
+      reverse: app.reverse  
+    });
   });
 
   // Crear curso (POST /courses) + validación
@@ -122,6 +126,6 @@ export default async (app, opts) => {
     };
 
     state.courses.push(newCourse);
-    res.redirect("/courses");
+    res.redirect(app.reverse("courses"));
   });
 };

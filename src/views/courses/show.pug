@@ -1,7 +1,25 @@
 extends ../layouts/page.pug
 
-block content   
-    a(href='/courses')
-    h1= course.title
-    p= course.description   
-        p Duración: #{course.duration} horas
+block content
+    h1 Detalle del Curso
+
+    .user-profile   
+        .user-card 
+        p       
+            strong Título:
+            span #{course.title}
+        p 
+            strong Description:
+            span #{course.description}
+    if course.duration   
+        p 
+            strong Duración: 
+            span #{course.duration} horas
+    if course.tags 
+        p   
+            strong Tags: 
+            span= course.tags.join(', ')
+
+    .actions
+        a.back-link(href=reverse('courses')) ← Volver a todos los cursos
+        a.back-link(href=reverse('root')) ← Volver al inicio
