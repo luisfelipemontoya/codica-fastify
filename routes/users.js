@@ -13,7 +13,7 @@ const state = {
 export default async (app, opts) => { 
   await app.register(formbody);
  
-  //Listar todos los usuarios
+  //READ: Listar todos los usuarios
   app.get("/users", { name: "users" }, (req, res) => {
     res.view("src/views/users/index", { 
       users: state.users,
@@ -21,11 +21,12 @@ export default async (app, opts) => {
     });  
   });
   
-  //Formulario de creación
+  //CREATE: Formulario de creación
   app.get("/users/new", { name: "newUser" }, (req, res) => {
     res.view("src/views/users/new", { reverse: app.reverse });
   });
 
+  // READ: Ver usuario específico
   app.get("/users/:id",  { name: "user" },  (req, res) => {
     const { id } = req.params;
     const user = state.users.find(u => u.id === parseInt(id));
@@ -40,7 +41,7 @@ export default async (app, opts) => {
      });
   });
 
-  // Crear usuario (POST /users) + validación
+  // CREATE: Crear usuario (POST /users) + validación
   app.post("/users", {
     attachValidation: true,
     schema: {
@@ -88,6 +89,64 @@ export default async (app, opts) => {
 
     state.users.push(newUser); 
 
+    res.redirect(app.reverse("users"));
+  });
+
+  // UPDATE: Formulario para editar usuario
+  app.get("/users/:id/edit", { name: "editUser" }, (req, res) => {
+    const { id } = req.params;
+    const user = state.users.find(u => u.id === parseInt(id));
+
+    if (!user) {
+      return res.code(404).send({ message: "User not found" });
+    }
+
+    res.view("src/views/users/edit", { 
+      user,
+      reverse: app.reverse 
+    });
+  });
+
+  // UPDATE: Actualizar usuario (POST con _method override para formularios HTML)
+  app.post("/users/:id", { name: "updateUser" }, (req, res) => {
+    const { id } = req.params;
+    const { _method, name, email } = req.body;
+    const userIndex = state.users.findIndex(u => u.id === parseInt(id));
+
+    if (userIndex === -1) {
+      return res.code(404).send({ message: "User not found" });
+    }
+
+    // Actualizar (PATCH via _method)
+    if (_method === 'patch') {
+      state.users[userIndex] = { 
+        ...state.users[userIndex], 
+        name: name.trim(), 
+        email: email.trim().toLowerCase() 
+    };
+
+    return res.redirect(app.reverse("users"));
+  }
+
+    // Eliminar (DELETE via _method)
+    if (_method === 'delete') {
+      state.users.splice(userIndex, 1);
+      return res.redirect(app.reverse("users"));
+    }
+
+    return res.code(400).send({ message: "Invalid _method" });
+  });
+
+  // DELETE: Eliminar usuario (DELETE nativo para APIs)
+  app.delete("/users/:id", { name: "deleteUser" }, (req, res) => {
+    const { id } = req.params;
+    const userIndex = state.users.findIndex(u => u.id === parseInt(id));
+
+    if (userIndex === -1) {
+      return res.code(404).send({ message: "User not found" });
+    }
+
+    state.users.splice(userIndex, 1);
     res.redirect(app.reverse("users"));
   });
 };

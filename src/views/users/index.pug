@@ -17,5 +17,12 @@ block content
             a(href=reverse('user', { id: user.id }))= user.name
           p ID: #{user.id}
           p Correo: #{user.email || 'No disponible'}
+          .user-actions
+            a.btn-edit(href=reverse('editUser', { id: user.id })) ✏️ Editar
+            form(action=reverse('deleteUser', { id: user.id }), method='post')
+              input(type='hidden' name='_method' value='delete')
+              button.btn-delete(type='submit' onclick='return confirm("¿Eliminar usuario?")') 🗑️ Eliminar 
+              //-  HTML no soporta DELETE y PATCH en formularios. Solución: usar _method:    
+
   .actions
     a.back-link(href=reverse('root')) ← Volver al inicio

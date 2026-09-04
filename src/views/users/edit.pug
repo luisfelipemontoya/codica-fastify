@@ -1,0 +1,46 @@
+extends ../layouts/page.pug
+
+block content
+  h1 Editar Usuario
+
+  if error
+    .alert.alert-danger
+      p= error.message
+      if error.errors
+        ul
+          each err in error.errors
+            li= err
+
+    //-name='_method' // Campo oculto en formularios HTML para simular métodos HTTP (PUT, DELETE, PATCH)
+    //- Alternativa más moderna:fetch (JS nativo) -> fetch('/user/1', { method: 'DELETE' });   // Con Axios -> axios.delete('/user/1');
+  .create-form.form-container
+    form(action=reverse('updateUser', { id: user.id }) method='post')
+      input(type='hidden' name='_method' value='patch')
+      
+      .form-group
+        label(for='name') Nombre:
+        input(
+          type='text'
+          name='name'
+          id='name'
+          value=user.name || ''
+          required
+        )
+      
+      .form-group
+        label(for='email') Correo electrónico:
+        input(
+          type='email'
+          name='email'
+          id='email'
+          value=user.email || ''
+          required
+        )
+      
+      .form-actions
+        button(type='submit') Actualizar Usuario
+        a(href=reverse('users')) Cancelar
+
+  .actions
+    a.back-link(href=reverse('users')) ← Volver a usuarios
+    a.back-link(href=reverse('root')) ← Volver al inicio
