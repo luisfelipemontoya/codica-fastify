@@ -296,3 +296,55 @@ p.error-message {
   margin: 0;
   font-weight: bold;
 }
+
+/* ===== ACCIONES DE USUARIO ===== */
+.user-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e9ecef;
+  flex-wrap: wrap;
+}
+
+.user-actions .btn-edit {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: #2c3e50;
+  color: #ffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.user-actions .btn-edit:hover {
+  background: #5b81a6;
+}
+
+.user-actions .btn-delete {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: #c4bfc0;
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.user-actions .btn-delete:hover {
+  background: #cf6671;
+}
+
+.user-actions form {
+  display: inline-block;
+  margin: 0;
+}
