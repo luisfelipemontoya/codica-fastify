@@ -33,5 +33,12 @@ block content
                 p= course.description 
                 if course.duration
                     p Duración: #{course.duration} horas
+                if course.tags
+                    p Tags: #{course.tags.join(', ')}
+                .user-actions
+                    a.btn-edit(href=reverse('editCourse', { id: course.id })) ✏️ Editar
+                    form(action=reverse('updateCourse', { id: course.id }) method='post')
+                        input(type='hidden' name='_method' value='delete')
+                        button.btn-delete(type='submit' onclick='return confirm("¿Eliminar curso?")') 🗑️ Eliminar
     .actions
         a.back-link(href=reverse('root')) ← Volver al inicio

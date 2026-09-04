@@ -44,7 +44,7 @@ const state = {
 export default async (app, opts) => {
   await app.register(formbody);
 
-  // Listar todos los cursos (GET /courses)
+  // READ:Listar todos los cursos (GET /courses)
   app.get("/courses", { name: "courses" }, (req, res) => {
     const { term } = req.query; // Obtener parámetro de búsqueda
     let filteredCourses = state.courses;
@@ -66,12 +66,12 @@ export default async (app, opts) => {
     res.view("src/views/courses/index", data);
   });
 
-  //Formulario para crear curso (GET /courses/new)
+  //CREATE: Formulario para crear curso (GET /courses/new)
   app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
     res.view("src/views/courses/new", { reverse: app.reverse });
   });
 
-  // Listar 1 curso específico (GET /courses/:id)
+  //READ: Listar 1 curso específico (GET /courses/:id)
   app.get("/courses/:id", { name: "course" }, (req, res) => {
     const { id } = req.params;
     const course = state.courses.find(c => c.id === parseInt(id));
@@ -86,7 +86,7 @@ export default async (app, opts) => {
     });
   });
 
-  // Crear curso (POST /courses) + validación
+  // CREATE: Crear curso (POST /courses) + validación
   app.post("/courses", {
     attachValidation: true,
     schema: {
@@ -128,4 +128,63 @@ export default async (app, opts) => {
     state.courses.push(newCourse);
     res.redirect(app.reverse("courses"));
   });
+
+  // UPDATE: Formulario para editar curso (Añadir nueva funcionalidad -edit)
+  app.get("/courses/:id/edit", { name: "editCourse" }, (req, res) => {
+    const { id } = req.params;
+    const course = state.courses.find(c => c.id === parseInt(id));
+
+    if (!course) {
+      return res.code(404).send({ message: "Course not found" });
+    }
+
+    res.view("src/views/courses/edit", { 
+      course,
+      reverse: app.reverse 
+    });
+  });
+
+   // UPDATE: Actualizar curso (POST con _method)
+  app.post("/courses/:id", { name: "updateCourse" }, (req, res) => {
+    const { id } = req.params;
+    const { _method, title, description, duration } = req.body;
+    const courseIndex = state.courses.findIndex(c => c.id === parseInt(id));
+
+    if (courseIndex === -1) {
+      return res.code(404).send({ message: "Course not found" });
+    }
+
+    // Actualizar (PATCH via _method)
+    if (_method === 'patch') {
+      state.courses[courseIndex] = { 
+        ...state.courses[courseIndex], 
+        title: title.trim(), 
+        description: description.trim(),
+        duration: parseInt(duration)
+      };
+      return res.redirect(app.reverse("courses"));
+    }
+
+    // Eliminar (DELETE via _method)
+    if (_method === 'delete') {
+      state.courses.splice(courseIndex, 1);
+      return res.redirect(app.reverse("courses"));
+    }
+
+    return res.code(400).send({ message: "Invalid _method" });
+  });
+
+  // DELETE: Eliminar curso (DELETE nativo para APIs)
+  app.delete("/courses/:id", { name: "deleteCourse" }, (req, res) => {
+    const { id } = req.params;
+    const courseIndex = state.courses.findIndex(c => c.id === parseInt(id));
+
+    if (courseIndex === -1) {
+      return res.code(404).send({ message: "Course not found" });
+    }
+
+    state.courses.splice(courseIndex, 1);
+    res.redirect(app.reverse("courses"));
+  });
+
 };
