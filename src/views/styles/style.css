@@ -48,6 +48,26 @@ main {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Mensaje de bienvenida */
+.welcome-message {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.welcome-message p {
+  margin: 0.5rem 0;
+}
+
+.welcome-message p:first-child {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 /* Cursos y usuarios*/
 .users-list .course-card,
 .users-list .user-card {

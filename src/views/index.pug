@@ -1,5 +1,16 @@
 extends layouts/page.pug
 
 block content 
-    h1 Bienvenido a Códica 
+    h1 Bienvenido a Códica     
+
+    if !visited
+        .welcome-message 
+            p 🎉 ¡Bienvenido a tu primera visita!
+            p Este mensaje solo se muestra una vez.
+            p Recarga la página y desaparecerá.
+
     p Aprende programción con nosotros
+
+    .actions
+    a.back-link(href=reverse('users')) 👥 Ver Usuarios
+    a.back-link(href=reverse('courses')) 📚 Ver Cursos
