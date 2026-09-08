@@ -12,6 +12,17 @@ html(lang='es')
                     a(href=reverse('courses')) Cursos 
                     a(href=reverse('users')) Usuarios
                     a(href=reverse('about')) Quiénes somos
+
+                    if userId 
+                        .user-section
+                            span #{userName}
+                            form(action=reverse('logout') method='post')
+                                input(type='hidden' name='_method' value='delete')
+                                button(type='submit') Cerrar Sesión 
+                    else
+                        .user-section
+                            a.btn-login-nav(href=reverse('login')) Iniciar Sesión
+                    
             main 
                 block content 
 

@@ -13,15 +13,15 @@ export default async (app, opts) => {
       //3. pasar datos a la plantilla
     const data ={
       visited: visited || false,
-      reverse: app.reverse
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
+      reverse: app.reverse      
     };
 
-    res.view("src/views/index", { 
-      visited: visited,
-      reverse: app.reverse } );
+    return res.view("src/views/index", data);
   });
 
-  app.get("/about", { name: "about" }, (req, res) => {
+  app.get("/about", { name: "about" }, async (req, res) => {
     res.send("About this project");
   });
 };
