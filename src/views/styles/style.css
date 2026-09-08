@@ -368,3 +368,143 @@ p.error-message {
   display: inline-block;
   margin: 0;
 }
+
+/* Botones de autenticación en el contenido */
+.auth-actions {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.btn-login {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-login:hover {
+  background: #2980b9;
+}
+
+/* ===== NAVEGACIÓN - BOTÓN INICIAR SESIÓN ===== */
+.btn-login-nav {
+  background: #d2c187;
+  color: #2c3e50;
+  padding: 0.2rem 0.7rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-login-nav:hover {
+  background: #668294;
+  color: #2c3e50;
+}
+
+.user-section {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-section form {
+  display: inline-block;
+  margin: 0;
+}
+
+.user-section button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+}
+
+.user-section button:hover {
+  background: #c82333;
+}
+
+/* ===== FORMULARIO DE LOGIN ===== */
+.login-form {
+  max-width: 400px; 
+  margin: 0 auto;
+}
+
+.login-title  {
+  text-align: center;
+}
+
+.login-form .form-group {
+  margin-bottom: 0.3rem;
+}
+
+.login-form .form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.login-form .form-group input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  background: white;
+}
+
+.login-form .form-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.login-form .form-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.login-form .form-actions button {
+  padding: 0.5rem 1.5rem;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.login-form .form-actions button:hover {
+  background: #405b75;
+}
+
+.login-form .form-actions a {
+  padding: 0.5rem 1.5rem;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.login-form .form-actions a:hover {
+  background: #a1aeb8;
+}
