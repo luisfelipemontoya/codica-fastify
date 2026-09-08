@@ -46,6 +46,7 @@ export default async (app, opts) => {
 
   // READ:Listar todos los cursos (GET /courses)
   app.get("/courses", { name: "courses" }, (req, res) => {
+    const flashMessages = res.flash();
     const { term } = req.query; // Obtener parámetro de búsqueda
     let filteredCourses = state.courses;
 
@@ -62,15 +63,16 @@ export default async (app, opts) => {
       header: "Cursos de programación",
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
+      flash: flashMessages,
       reverse: app.reverse
     };  
     
-    res.view("src/views/courses/index", data);
+    return res.view("src/views/courses/index", data);
   });
 
   //CREATE: Formulario para crear curso (GET /courses/new)
   app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
-    res.view("src/views/courses/new", { 
+    return res.view("src/views/courses/new", { 
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
       reverse: app.reverse });
@@ -85,7 +87,7 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "Course not found" });
     }
 
-    res.view("src/views/courses/show", { 
+    return res.view("src/views/courses/show", { 
       course,
       userId: req.session?.userId || null,
       userName: req.session?.userName || null, 
@@ -118,6 +120,7 @@ export default async (app, opts) => {
         description: req.body.description || '',
         duration: req.body.duration || '',
         error: req.validationError,
+        reverse: app.reverse 
       };
       return res.view("src/views/courses/new", data);
     }
@@ -133,7 +136,9 @@ export default async (app, opts) => {
     };
 
     state.courses.push(newCourse);
-    res.redirect(app.reverse("courses"));
+
+    req.flash("success", "✅ Curso creado correctamente");    
+    return res.redirect(app.reverse("courses"));
   });
 
   // UPDATE: Formulario para editar curso (Añadir nueva funcionalidad -edit)
@@ -145,7 +150,7 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "Course not found" });
     }
 
-    res.view("src/views/courses/edit", { 
+    return res.view("src/views/courses/edit", { 
       course,
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
@@ -171,12 +176,14 @@ export default async (app, opts) => {
         description: description.trim(),
         duration: parseInt(duration)
       };
+      req.flash("success", "✅ Curso actualizado correctamente"); 
       return res.redirect(app.reverse("courses"));
     }
 
     // Eliminar (DELETE via _method)
     if (_method === 'delete') {
       state.courses.splice(courseIndex, 1);
+      req.flash("success", "✅ Curso eliminado correctamente"); 
       return res.redirect(app.reverse("courses"));
     }
 
@@ -193,7 +200,7 @@ export default async (app, opts) => {
     }
 
     state.courses.splice(courseIndex, 1);
-    res.redirect(app.reverse("courses"));
+    return res.redirect(app.reverse("courses"));
   });
 
 };
