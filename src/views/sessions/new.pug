@@ -1,0 +1,36 @@
+extends ../layouts/page.pug
+
+block content
+  h1.login-title  Iniciar Sesión
+
+  if error
+    .alert.alert-danger
+      p= error
+
+  .login-form.form-container
+    form(action=reverse('session') method='post')
+      .form-group
+        label(for='email') Correo electrónico:
+        input(
+          type='email'
+          name='email'
+          id='email'
+          value=email || ''
+          required
+        )
+      
+      .form-group
+        label(for='password') Contraseña:
+        input(
+          type='password'
+          name='password'
+          id='password'
+          required
+        )
+      
+      .form-actions
+        button(type='submit') Iniciar Sesión
+        a(href=reverse('root')) Cancelar
+
+  .actions
+    a.back-link(href=reverse('root')) ← Volver al inicio
