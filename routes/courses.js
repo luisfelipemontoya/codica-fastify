@@ -60,6 +60,8 @@ export default async (app, opts) => {
       courses: filteredCourses,
       term: term || '', // Mantener el valor en el input
       header: "Cursos de programación",
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
       reverse: app.reverse
     };  
     
@@ -68,7 +70,10 @@ export default async (app, opts) => {
 
   //CREATE: Formulario para crear curso (GET /courses/new)
   app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
-    res.view("src/views/courses/new", { reverse: app.reverse });
+    res.view("src/views/courses/new", { 
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
+      reverse: app.reverse });
   });
 
   //READ: Listar 1 curso específico (GET /courses/:id)
@@ -81,7 +86,9 @@ export default async (app, opts) => {
     }
 
     res.view("src/views/courses/show", { 
-      course, 
+      course,
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null, 
       reverse: app.reverse  
     });
   });
@@ -140,6 +147,8 @@ export default async (app, opts) => {
 
     res.view("src/views/courses/edit", { 
       course,
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
       reverse: app.reverse 
     });
   });

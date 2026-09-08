@@ -17,17 +17,22 @@ export default async (app, opts) => {
   app.get("/users", { name: "users" }, (req, res) => {
     res.view("src/views/users/index", { 
       users: state.users,
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
       reverse: app.reverse 
     });  
   });
   
   //CREATE: Formulario de creación
-  app.get("/users/new", { name: "newUser" }, (req, res) => {
-    res.view("src/views/users/new", { reverse: app.reverse });
+  app.get("/users/new", { name: "newUser" }, (req, res) => {    
+    res.view("src/views/users/new", { 
+      userId: req.session?.userId || null,      
+      userName: req.session?.userName || null,
+      reverse: app.reverse });
   });
 
   // READ: Ver usuario específico
-  app.get("/users/:id",  { name: "user" },  (req, res) => {
+  app.get("/users/:id",  { name: "user" }, (req, res) => {
     const { id } = req.params;
     const user = state.users.find(u => u.id === parseInt(id));
 
@@ -37,6 +42,8 @@ export default async (app, opts) => {
 
     res.view("src/views/users/show", { 
       user,
+      userId: req.session?.userId || null,      
+      userName: req.session?.userName || null,
       reverse: app.reverse 
      });
   });
@@ -103,6 +110,8 @@ export default async (app, opts) => {
 
     res.view("src/views/users/edit", { 
       user,
+      userId: req.session?.userId || null,      
+      userName: req.session?.userName || null,
       reverse: app.reverse 
     });
   });
