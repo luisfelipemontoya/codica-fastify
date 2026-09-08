@@ -317,6 +317,19 @@ p.error-message {
   font-weight: bold;
 }
 
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+
 /* ===== ACCIONES DE USUARIO ===== */
 .user-actions {
   display: flex;
