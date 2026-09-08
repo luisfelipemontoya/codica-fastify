@@ -15,22 +15,16 @@ export default async (app, opts) => {
  
   //READ: Listar todos los usuarios
   app.get("/users", { name: "users" }, (req, res) => {
-    res.view("src/views/users/index", { 
+    const flashMessages = res.flash();    
+    return res.view("src/views/users/index", { 
       users: state.users,
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
+      flash: flashMessages,
       reverse: app.reverse 
     });  
   });
   
-  //CREATE: Formulario de creación
-  app.get("/users/new", { name: "newUser" }, (req, res) => {    
-    res.view("src/views/users/new", { 
-      userId: req.session?.userId || null,      
-      userName: req.session?.userName || null,
-      reverse: app.reverse });
-  });
-
   // READ: Ver usuario específico
   app.get("/users/:id",  { name: "user" }, (req, res) => {
     const { id } = req.params;
@@ -40,7 +34,7 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "User not found" });
     }
 
-    res.view("src/views/users/show", { 
+    return res.view("src/views/users/show", { 
       user,
       userId: req.session?.userId || null,      
       userName: req.session?.userName || null,
@@ -48,11 +42,19 @@ export default async (app, opts) => {
      });
   });
 
+  //CREATE: Formulario de creación
+  app.get("/users/new", { name: "newUser" }, (req, res) => {    
+    return res.view("src/views/users/new", { 
+      userId: req.session?.userId || null,      
+      userName: req.session?.userName || null,
+      reverse: app.reverse });
+  });
+
   // CREATE: Crear usuario (POST /users) + validación
   app.post("/users", {
     attachValidation: true,
     schema: {
-       body: yup.object({
+        body: yup.object({
         name: yup.string().min(2, "El nombre debe tener al menos 2 caracteres"),
         email: yup.string().email("Formato de email inválido"),
         password: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
@@ -80,23 +82,42 @@ export default async (app, opts) => {
       password: req.body.password || '',
       passwordConfirmation: req.body.passwordConfirmation || '',
       error: req.validationError,
+      reverse: app.reverse
     };
     return res.view("src/views/users/new", data);
   }
 
   const { name, email, password } = req.body;
   
+  // Verificar si el email ya existe
+  const existingUser = state.users.find(u => u.email === email);
+  if (existingUser) {
+    req.flash("error", "❌ El correo electrónico ya está registrado");    
+    const data = {
+      name: name,
+      email: email,
+      password: password,
+      passwordConfirmation: req.body.passwordConfirmation || '',
+      error: { message: "El correo electrónico ya está registrado"}
+    };
+    return res.view("src/views/users/new", data);
+  }
+
     //Datos válidos: Normalizar y guardar
     const newUser = {
       id: state.users.length + 1,
       name: name.trim(),
       email: email.trim().toLowerCase(),
-      password: password
+      password: password // En producción: hashear contraseña
     };
 
     state.users.push(newUser); 
 
-    res.redirect(app.reverse("users"));
+    //Mensaje Flash de éxito
+    req.flash("success", "✅Usuario creado correctamente");
+
+    
+    return res.redirect(app.reverse("users"));
   });
 
   // UPDATE: Formulario para editar usuario
@@ -108,7 +129,7 @@ export default async (app, opts) => {
       return res.code(404).send({ message: "User not found" });
     }
 
-    res.view("src/views/users/edit", { 
+    return res.view("src/views/users/edit", { 
       user,
       userId: req.session?.userId || null,      
       userName: req.session?.userName || null,
@@ -133,13 +154,14 @@ export default async (app, opts) => {
         name: name.trim(), 
         email: email.trim().toLowerCase() 
     };
-
+    req.flash("success", "✅ Usuario actualizado correctamente");   
     return res.redirect(app.reverse("users"));
   }
 
     // Eliminar (DELETE via _method)
     if (_method === 'delete') {
       state.users.splice(userIndex, 1);
+      req.flash("success", "✅ Usuario eliminado correctamente"); 
       return res.redirect(app.reverse("users"));
     }
 
@@ -156,6 +178,6 @@ export default async (app, opts) => {
     }
 
     state.users.splice(userIndex, 1);
-    res.redirect(app.reverse("users"));
+    return res.redirect(app.reverse("users"));
   });
 };
