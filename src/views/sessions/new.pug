@@ -3,10 +3,6 @@ extends ../layouts/page.pug
 block content
   h1.login-title  Iniciar Sesión
 
-  if error
-    .alert.alert-danger
-      p= error
-
   .login-form.form-container
     form(action=reverse('session') method='post')
       .form-group

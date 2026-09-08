@@ -23,7 +23,12 @@ html(lang='es')
                         .user-section
                             a.btn-login-nav(href=reverse('login')) Iniciar Sesión
                     
-            main 
+            main                
+                if flash  
+                    each messages, type in flash    
+                        each message in messages 
+                            .alert(class=`alert-${type}`)= message
+
                 block content 
 
             footer 

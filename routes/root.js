@@ -3,12 +3,14 @@ export default async (app, opts) => {
     // 1. Leer cookie de visita
     const visited = req.cookies?.visited === 'true';
 
-    //2.  Establecer cookie para futuras visitas (30días)
+    //2.  Establecer cookie SOLO si es primera visita
+    if (!visited) {   
       res.cookie('visited', 'true', {
-        maxAge: 60 * 60 * 24 * 30,
-        httpOnly: true,
-        path: '/'
-      });
+          maxAge: 60 * 60 * 24 * 30,
+          httpOnly: true,
+          path: '/'
+        });
+    }
     
       //3. pasar datos a la plantilla
     const data ={
@@ -21,7 +23,7 @@ export default async (app, opts) => {
     return res.view("src/views/index", data);
   });
 
-  app.get("/about", { name: "about" }, async (req, res) => {
-    res.send("About this project");
+  app.get("/about", { name: "about" }, (req, res) => {
+    return res.send("About this project");
   });
 };
