@@ -1,23 +1,17 @@
 import yup from "yup";
 import formbody from "@fastify/formbody";
-
-//Datos temporales
-const state = {
-  users: [
-    { id: 1, name: "Felipe Montoya" },
-    { id: 2, name: "María González" },
-    { id: 3, name: "Carlos Pérez" }
-  ]
-};
+import db from "../lib/db.js";
 
 export default async (app, opts) => { 
   await app.register(formbody);
  
   //READ: Listar todos los usuarios
   app.get("/users", { name: "users" }, (req, res) => {
-    const flashMessages = res.flash();    
+    const flashMessages = res.flash();
+    const users = db.prepare("SELECT* FROM users").all();
+    
     return res.view("src/views/users/index", { 
-      users: state.users,
+      users,
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
       flash: flashMessages,
@@ -28,7 +22,7 @@ export default async (app, opts) => {
   // READ: Ver usuario específico
   app.get("/users/:id",  { name: "user" }, (req, res) => {
     const { id } = req.params;
-    const user = state.users.find(u => u.id === parseInt(id));
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 
     if (!user) {
       return res.code(404).send({ message: "User not found" });
@@ -47,7 +41,8 @@ export default async (app, opts) => {
     return res.view("src/views/users/new", { 
       userId: req.session?.userId || null,      
       userName: req.session?.userName || null,
-      reverse: app.reverse });
+      reverse: app.reverse 
+    });
   });
 
   // CREATE: Crear usuario (POST /users) + validación
@@ -90,7 +85,7 @@ export default async (app, opts) => {
   const { name, email, password } = req.body;
   
   // Verificar si el email ya existe
-  const existingUser = state.users.find(u => u.email === email);
+  const existingUser = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
   if (existingUser) {
     req.flash("error", "❌ El correo electrónico ya está registrado");    
     const data = {
@@ -98,32 +93,27 @@ export default async (app, opts) => {
       email: email,
       password: password,
       passwordConfirmation: req.body.passwordConfirmation || '',
-      error: { message: "El correo electrónico ya está registrado"}
+      error: { message: "El correo electrónico ya está registrado"},
+      reverse: app.reverse
+
     };
     return res.view("src/views/users/new", data);
   }
 
-    //Datos válidos: Normalizar y guardar
-    const newUser = {
-      id: state.users.length + 1,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password: password // En producción: hashear contraseña
-    };
-
-    state.users.push(newUser); 
+    //Guardar nuevo usuario en BD
+    const result = db
+      .prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)")
+      .run(name.trim(), email.trim().toLowerCase(), password);
 
     //Mensaje Flash de éxito
-    req.flash("success", "✅Usuario creado correctamente");
-
-    
+    req.flash("success", "✅Usuario creado correctamente");    
     return res.redirect(app.reverse("users"));
   });
 
   // UPDATE: Formulario para editar usuario
   app.get("/users/:id/edit", { name: "editUser" }, (req, res) => {
     const { id } = req.params;
-    const user = state.users.find(u => u.id === parseInt(id));
+    const user = db.prepare("SELECT * FROM users WEHRE id = ?").get(id);
 
     if (!user) {
       return res.code(404).send({ message: "User not found" });
@@ -141,26 +131,20 @@ export default async (app, opts) => {
   app.post("/users/:id", { name: "updateUser" }, (req, res) => {
     const { id } = req.params;
     const { _method, name, email } = req.body;
-    const userIndex = state.users.findIndex(u => u.id === parseInt(id));
-
-    if (userIndex === -1) {
-      return res.code(404).send({ message: "User not found" });
-    }
-
+    
     // Actualizar (PATCH via _method)
     if (_method === 'patch') {
-      state.users[userIndex] = { 
-        ...state.users[userIndex], 
-        name: name.trim(), 
-        email: email.trim().toLowerCase() 
-    };
+      db
+      .prepare("UPDATE users SET name = ?, email = ? WHERE id = ?")
+      .run(name.trim(), email.trim().toLowerCase(), parseInt(id));
+
     req.flash("success", "✅ Usuario actualizado correctamente");   
     return res.redirect(app.reverse("users"));
   }
 
     // Eliminar (DELETE via _method)
     if (_method === 'delete') {
-      state.users.splice(userIndex, 1);
+      db.prepare("DELETE FROM users WHERE id = ?").run(parseInt(id));
       req.flash("success", "✅ Usuario eliminado correctamente"); 
       return res.redirect(app.reverse("users"));
     }
@@ -171,13 +155,7 @@ export default async (app, opts) => {
   // DELETE: Eliminar usuario (DELETE nativo para APIs)
   app.delete("/users/:id", { name: "deleteUser" }, (req, res) => {
     const { id } = req.params;
-    const userIndex = state.users.findIndex(u => u.id === parseInt(id));
-
-    if (userIndex === -1) {
-      return res.code(404).send({ message: "User not found" });
-    }
-
-    state.users.splice(userIndex, 1);
+    db.prepare("DELETE FROM users WHERE id = ?").run(parseInt(id));
     return res.redirect(app.reverse("users"));
   });
 };
