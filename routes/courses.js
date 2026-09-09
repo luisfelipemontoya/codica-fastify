@@ -1,64 +1,33 @@
 import yup from "yup";
 import formbody from "@fastify/formbody"; 
-
-//Datos temporales
-const state = {
-  courses: [
-    {
-      id: 1,
-      title: "JS: Arrays",
-      description: "Curso sobre arrays en JavaScript",
-      duration: 4,
-      tags: ["javascript", "arrays", "principiantes"]
-    },
-    {
-      id: 2,
-      title: "JS: Funciones",
-      description: "Curso sobre funciones en JavaScript",
-      duration: 6,
-      tags: ["javascript", "funciones", "intermedio"]
-    },
-    {
-      id: 3,
-      title: "JS: Objetos",
-      description: "Curso sobre objetos en JavaScript",
-      duration: 5
-    },
-    { 
-      id: 4, 
-      title: "CSS Grid", 
-      description: "Diseño moderno y responsive con CSS Grid Layout",
-      duration: 3,
-      tags: ["css", "grid", "diseño"]
-    },
-    { 
-      id: 5, 
-      title: "HTML Semántico", 
-      description: "Estructura tu contenido con HTML5 semántico para mejor accesibilidad",
-      duration: 2,
-      tags: ["html", "accesibilidad", "principiantes"]
-    }
-  ]
-};
+import db from "../lib/db.js";
 
 export default async (app, opts) => {
   await app.register(formbody);
 
+   // ==================== READ ====================
   // READ:Listar todos los cursos (GET /courses)
   app.get("/courses", { name: "courses" }, (req, res) => {
     const flashMessages = res.flash();
     const { term } = req.query; // Obtener parámetro de búsqueda
-    let filteredCourses = state.courses;
+    let query = "SELECT * FROM courses";
+    let params = [];
 
     if (term) {
-      // Filtrar por título O descripción (case insensitive)
-      filteredCourses = state.courses.filter(course =>
-        course.title.toLowerCase().includes(term.toLowerCase()) ||
-        course.description.toLowerCase().includes(term.toLowerCase())        
-      );
+      query = "SELECT * FROM courses WHERE title LIKE ? OR description LIKE ?";
+      params = [`%${term}%`, `%${term}%`];
     }
+
+    const courses = db.prepare(query).all(...params);
+
+    // Convertir tags de string a array
+    const coursesWithTags = courses.map(course => ({
+      ...course,
+      tags: course.tags ? course.tags.split(',') : []
+    }));
+
     const data = {
-      courses: filteredCourses,
+      courses: coursesWithTags,
       term: term || '', // Mantener el valor en el input
       header: "Cursos de programación",
       userId: req.session?.userId || null,
@@ -70,29 +39,35 @@ export default async (app, opts) => {
     return res.view("src/views/courses/index", data);
   });
 
-  //CREATE: Formulario para crear curso (GET /courses/new)
-  app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
-    return res.view("src/views/courses/new", { 
-      userId: req.session?.userId || null,
-      userName: req.session?.userName || null,
-      reverse: app.reverse });
-  });
-
-  //READ: Listar 1 curso específico (GET /courses/:id)
+    //READ: Listar 1 curso específico (GET /courses/:id)
   app.get("/courses/:id", { name: "course" }, (req, res) => {
     const { id } = req.params;
-    const course = state.courses.find(c => c.id === parseInt(id));
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(id);
 
     if (!course) {
       return res.code(404).send({ message: "Course not found" });
     }
 
     return res.view("src/views/courses/show", { 
-      course,
+      course: {
+      ...course,
+      tags: course.tags ? course.tags.split(',') : [] 
+      },
       userId: req.session?.userId || null,
       userName: req.session?.userName || null, 
       reverse: app.reverse  
     });
+  });
+
+    // ==================== CREATE ====================
+  //CREATE: Formulario para crear curso (GET /courses/new)
+  app.get("/courses/new",  { name: "newCourse" }, (req, res) => {
+    const flashMessages = res.flash(); 
+    return res.view("src/views/courses/new", { 
+      userId: req.session?.userId || null,
+      userName: req.session?.userName || null,
+      flash: flashMessages, 
+      reverse: app.reverse });
   });
 
   // CREATE: Crear curso (POST /courses) + validación
@@ -128,23 +103,20 @@ export default async (app, opts) => {
     //Datos válidos: guardar curso
     const { title, description, duration } = req.body;
 
-    const newCourse = {
-      id: state.courses.length + 1,
-      title: title.trim(),
-      description: description.trim(),
-      duration: parseInt(duration),
-    };
-
-    state.courses.push(newCourse);
+    const result = db
+      .prepare("INSERT INTO courses (title, description, duration) VALUES (?, ?, ?)")
+      .run(title.trim(), description.trim(), parseInt(duration));
 
     req.flash("success", "✅ Curso creado correctamente");    
     return res.redirect(app.reverse("courses"));
   });
 
+   // ==================== UPDATE ====================
   // UPDATE: Formulario para editar curso (Añadir nueva funcionalidad -edit)
   app.get("/courses/:id/edit", { name: "editCourse" }, (req, res) => {
     const { id } = req.params;
-    const course = state.courses.find(c => c.id === parseInt(id));
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(id); 
+    const flashMessages = res.flash();
 
     if (!course) {
       return res.code(404).send({ message: "Course not found" });
@@ -154,6 +126,7 @@ export default async (app, opts) => {
       course,
       userId: req.session?.userId || null,
       userName: req.session?.userName || null,
+      flash: flashMessages,
       reverse: app.reverse 
     });
   });
@@ -162,27 +135,20 @@ export default async (app, opts) => {
   app.post("/courses/:id", { name: "updateCourse" }, (req, res) => {
     const { id } = req.params;
     const { _method, title, description, duration } = req.body;
-    const courseIndex = state.courses.findIndex(c => c.id === parseInt(id));
-
-    if (courseIndex === -1) {
-      return res.code(404).send({ message: "Course not found" });
-    }
-
+    
     // Actualizar (PATCH via _method)
     if (_method === 'patch') {
-      state.courses[courseIndex] = { 
-        ...state.courses[courseIndex], 
-        title: title.trim(), 
-        description: description.trim(),
-        duration: parseInt(duration)
-      };
+      db
+        .prepare("UPDATE courses SET title = ?, description = ?, duration = ? WHERE id = ?")
+        .run(title.trim(), description.trim(), parseInt(duration), parseInt(id));
+
       req.flash("success", "✅ Curso actualizado correctamente"); 
       return res.redirect(app.reverse("courses"));
     }
 
     // Eliminar (DELETE via _method)
     if (_method === 'delete') {
-      state.courses.splice(courseIndex, 1);
+      db.prepare("DELETE FROM courses WHERE id = ?").run(parseInt(id));
       req.flash("success", "✅ Curso eliminado correctamente"); 
       return res.redirect(app.reverse("courses"));
     }
@@ -193,14 +159,7 @@ export default async (app, opts) => {
   // DELETE: Eliminar curso (DELETE nativo para APIs)
   app.delete("/courses/:id", { name: "deleteCourse" }, (req, res) => {
     const { id } = req.params;
-    const courseIndex = state.courses.findIndex(c => c.id === parseInt(id));
-
-    if (courseIndex === -1) {
-      return res.code(404).send({ message: "Course not found" });
-    }
-
-    state.courses.splice(courseIndex, 1);
+    db.prepare("DELETE FROM courses WHERE id = ?").run(parseInt(id));
     return res.redirect(app.reverse("courses"));
   });
-
 };
