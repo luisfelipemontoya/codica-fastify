@@ -1,16 +1,10 @@
 import formbody from "@fastify/formbody";
-
-//Datos temporales
-const state = {
-  users: [
-    { id: 1, name: "Felipe Montoya", email: "felipe@example.com", password: "123456" },
-    { id: 2, name: "María González", email: "maria@example.com", password: "123456" }
-  ]
-};
+import db from "../lib/db.js";
 
 export default async (app, opts) => {
   await app.register(formbody);
 
+  // ==================== GET /login ====================
   // GET /login - Mostrar formulario de login
   app.get("/login", { name: "login" }, (req, res) => {
     const flashMessages = res.flash();
@@ -23,11 +17,12 @@ export default async (app, opts) => {
     });
   });
 
+  // ==================== POST /session ====================
   // POST /session - Procesar login (SIN verificar contraseña)
   app.post("/session", { name: "session" }, (req, res) => {
     const { _method, email } = req.body;
 
-     // Si es logout (DELETE desde formulario HTML)
+     //Logout (DELETE desde formulario HTML)
     if (_method === 'delete') {
       req.session.destroy((err) => {
         if (err) {
@@ -38,8 +33,8 @@ export default async (app, opts) => {
       return; // Importante: detener ejecución
     }
     
-    // Si es login. Buscar usuario por email (NO verificar contraseña)
-    const user = state.users.find(u => u.email === email);
+    //Login. Buscar usuario por email en BD (NO verificar contraseña)
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
     
     if (!user) {
     req.flash("error", "❌ Usuario no encontrado");
